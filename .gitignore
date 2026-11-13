@@ -1,0 +1,18 @@
+node_modules/
+.dictionary-store/
+.cert/
+test-results/
+*.tgz
+/artifacts/npm/
+release/
+.wrangler/
+.tools/
+.DS_Store
+/learning/
+
+# Provider-specific deployment guides stay local.
+/docs/deploy/
+
+# Product builds used by the interactive playground.
+playground/product/dist/
+playground/product/.generated/

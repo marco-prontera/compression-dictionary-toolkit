@@ -1,0 +1,11 @@
+import { prepareAssets, type Asset } from 'compression-dictionary-toolkit';
+import sharedDictionary from 'compression-dictionary-toolkit/vite';
+import { createDictionaryServer, createRequestHandler } from 'compression-dictionary-toolkit/server';
+import { createEdgeHandler, type EdgeManifest } from 'compression-dictionary-toolkit/edge';
+const assets: Promise<Asset[]> = prepareAssets([{ input: 'product.js', key: 'product', url: '/product-v1.js' }]);
+void assets;
+sharedDictionary({ historyLimit: 3, concurrency: 2 });
+createDictionaryServer({ root: 'dist', allowInsecureLocalhost: true });
+createRequestHandler({ root: async () => 'dist' });
+declare const manifest: EdgeManifest;
+createEdgeHandler({ manifest, loadObject: async () => new Uint8Array() });

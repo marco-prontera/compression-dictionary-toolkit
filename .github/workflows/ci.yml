@@ -1,0 +1,58 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    verify:
+        name: Node ${{ matrix.node }}
+        runs-on: ubuntu-24.04
+        timeout-minutes: 20
+        strategy:
+            fail-fast: false
+            matrix:
+                node: [22, 24]
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+            - name: Install compression tools
+              shell: bash
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y zstd build-essential curl
+                  brotli_build="$RUNNER_TEMP/brotli-build"
+                  mkdir -p "$brotli_build"
+                  curl --fail --location --retry 3 https://github.com/google/brotli/archive/refs/tags/v1.2.0.tar.gz -o "$brotli_build/source.tar.gz"
+                  tar -xzf "$brotli_build/source.tar.gz" -C "$brotli_build"
+                  cc -O2 -DNDEBUG -DBROTLI_BUILD_PORTABLE -I "$brotli_build/brotli-1.2.0/c/include" \
+                    "$brotli_build"/brotli-1.2.0/c/common/*.c "$brotli_build"/brotli-1.2.0/c/dec/*.c \
+                    "$brotli_build"/brotli-1.2.0/c/enc/*.c "$brotli_build/brotli-1.2.0/c/tools/brotli.c" \
+                    -lm -o "$brotli_build/brotli"
+                  printf '%s\n' "BROTLI_BIN=$brotli_build/brotli" >> "$GITHUB_ENV"
+            - run: npm ci
+            - run: npm run lint
+            - run: npm run format:check
+            - run: npm run doctor
+            - run: npm test
+            - run: npm run check:types
+            - run: npm run check:packages
+            - run: npm run demo:cycle
+            - run: npm run demo:export
+            - name: Install Chromium
+              if: matrix.node == 24
+              run: npx playwright install --with-deps chromium
+            - name: Verify browser negotiation
+              if: matrix.node == 24
+              run: npm run test:browser

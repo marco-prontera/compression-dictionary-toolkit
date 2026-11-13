@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Compression Dictionary Playground</title>
+        <link rel="stylesheet" href="/site.css" />
+        <script type="module" src="/site.js"></script>
+    </head>
+    <body>
+        <main>
+            <header class="masthead">
+                <a class="wordmark" href="/">CDT<span> / playground</span></a>
+                <span class="local-badge"><i></i> Real browser · local backend</span>
+            </header>
+            <section class="intro">
+                <p class="eyebrow">BUILD ON WHAT THE BROWSER ALREADY HAS</p>
+                <h1>Same product.<br /><span>A smaller next visit.</span></h1>
+                <p class="lead">
+                    Publish a new version of a Vite product. Load it on this demo site. Compare ordinary compression
+                    with a dictionary the browser kept from its previous visit.
+                </p>
+            </section>
+            <ol class="flow">
+                <li>
+                    <span>01</span>
+                    <div>
+                        <strong>Product</strong>
+                        <p>Vite builds versioned JS + CSS.</p>
+                    </div>
+                </li>
+                <li>
+                    <span>02</span>
+                    <div>
+                        <strong>Backend</strong>
+                        <p>The toolkit selects the response.</p>
+                    </div>
+                </li>
+                <li>
+                    <span>03</span>
+                    <div>
+                        <strong>Demo site</strong>
+                        <p>The browser loads and measures it.</p>
+                    </div>
+                </li>
+            </ol>
+            <section class="controls" aria-labelledby="controls-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">RELEASE CONTROLS</p>
+                        <h2 id="controls-title">Change the backend, then visit.</h2>
+                    </div>
+                    <span class="release-badge">Active backend <strong id="active-version">—</strong></span>
+                </div>
+                <div class="control-row">
+                    <div>
+                        <span class="control-label">1. Publish a prepared version</span>
+                        <div id="versions" class="version-buttons"></div>
+                    </div>
+                    <div>
+                        <span class="control-label">2. Request the active product</span
+                        ><button id="load-product" class="primary" disabled>
+                            Load product & compare <span>↗</span>
+                        </button>
+                    </div>
+                    <label class="codec"
+                        >Dictionary format<select id="encoding">
+                            <option value="auto">Automatic</option>
+                            <option value="dcb">Brotli dictionary (dcb)</option>
+                            <option value="dcz">Zstandard dictionary (dcz)</option>
+                        </select></label
+                    >
+                </div>
+                <p id="status" role="status" aria-live="polite">Preparing the first visit…</p>
+                <p class="hint">
+                    Try the skipped-release case: load v1, publish v2 and v3 without loading in between, then load v3.
+                </p>
+            </section>
+            <section aria-label="Product comparison">
+                <div class="comparison-heading">
+                    <h2>One product, two deliveries</h2>
+                    <span id="loaded-version">No visit measured yet</span>
+                </div>
+                <div class="comparison">
+                    <article class="delivery shared">
+                        <header>
+                            <div>
+                                <span class="dot"></span>
+                                <h3>With shared dictionary</h3>
+                            </div>
+                            <span id="shared-encoding" class="tag">First visit</span>
+                        </header>
+                        <div class="metrics">
+                            <div><span>JS + CSS body</span><strong id="shared-bytes">—</strong></div>
+                            <div><span>Product ready</span><strong id="shared-ready">—</strong></div>
+                        </div>
+                        <div id="shared-preview" class="preview"><p>Loading the product…</p></div>
+                        <p class="delivery-note">An ordinary first response becomes the base for later versions.</p>
+                    </article>
+                    <article class="delivery baseline">
+                        <header>
+                            <div>
+                                <span class="dot"></span>
+                                <h3>Without shared dictionary</h3>
+                            </div>
+                            <span id="baseline-encoding" class="tag">Ordinary compression</span>
+                        </header>
+                        <div class="metrics">
+                            <div><span>JS + CSS body</span><strong id="baseline-bytes">—</strong></div>
+                            <div><span>Product ready</span><strong id="baseline-ready">—</strong></div>
+                        </div>
+                        <div id="baseline-preview" class="preview"><p>Loading the product…</p></div>
+                        <p class="delivery-note">The same bytes, using ordinary Brotli, gzip, or identity.</p>
+                    </article>
+                </div>
+                <div class="saving">
+                    <div><span class="eyebrow">OBSERVED BODY SAVING</span><strong id="saving">—</strong></div>
+                    <p id="comparison-note">The first visit establishes a base. Later visits can reuse it.</p>
+                </div>
+            </section>
+            <section class="measurements">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">MEASURED IN THIS BROWSER</p>
+                        <h2>Requests from the last visit</h2>
+                    </div>
+                    <button id="export" class="secondary" disabled>Export measurements ↓</button>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Delivery / file</th>
+                                <th>Encoding</th>
+                                <th>Base used</th>
+                                <th>Body</th>
+                                <th>Decoded</th>
+                                <th>Resource time</th>
+                                <th>Server time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requests">
+                            <tr>
+                                <td colspan="7">Measurements appear after the product loads.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <details>
+                    <summary>Visit history <span id="history-count">0</span></summary>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Visit</th>
+                                    <th>Version</th>
+                                    <th>Shared body</th>
+                                    <th>Ordinary body</th>
+                                    <th>Saving</th>
+                                    <th>Shared ready</th>
+                                    <th>Ordinary ready</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history"></tbody>
+                        </table>
+                    </div>
+                </details>
+            </section>
+            <section class="notes">
+                <div>
+                    <h3>See the actual protocol</h3>
+                    <p>
+                        Open DevTools → Network. Keep <strong>Disable cache unchecked</strong> and enable Preserve log.
+                        Filter by <code>product-</code>. Inspect <code>Available-Dictionary</code>,
+                        <code>Content-Encoding</code>, and <code>Use-As-Dictionary</code>. No dictionary headers are
+                        injected by the page.
+                    </p>
+                </div>
+                <div>
+                    <h3>Read the measurements correctly</h3>
+                    <p>
+                        Each visit uses fresh request URLs while retaining dictionary storage. Delivery order
+                        alternates. Ready time covers the preview document, loading, and rendering; resource time covers
+                        each fetch. Neither isolates decompression CPU time. Localhost timings are noisy.
+                    </p>
+                    <p>
+                        Reloading the same version can use that version as its own base. Compare the first visit after a
+                        version change for update savings. Use a fresh browser profile for a cold visit. This product
+                        uses synthetic catalog and CSS data.
+                    </p>
+                </div>
+            </section>
+            <footer>Compression Dictionary Toolkit <span>Core → Vite plugin → server handler → your site</span></footer>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,3 @@
+# Prettier also reads .gitignore by default.
+# npm maintains the lockfile's formatting.
+package-lock.json

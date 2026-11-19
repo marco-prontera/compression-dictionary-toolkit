@@ -2,6 +2,8 @@
 
 Send smaller JavaScript and CSS updates by reusing bytes the browser already has.
 
+The library provides core APIs and a CLI to prepare dictionary-compressed assets and retain previous versions as dictionaries, a Vite plugin to automate this during builds, and Node and Web API handlers to serve the results. The handlers negotiate compression with the browser and fall back to ordinary Brotli, gzip, or uncompressed files when needed; no client-side JavaScript library is required.
+
 The browser downloads v1 normally. A `Use-As-Dictionary` response header lets it retain those decoded bytes. When it requests v3, it can announce its v1 dictionary; the server sends v3 compressed using that base when worthwhile. The browser reconstructs the complete v3 file, which can become its next base. No separate dictionary download is required by the default flow.
 
 Read [how it works](docs/how-it-works.md) for plain-language examples and history/fallback behavior.
